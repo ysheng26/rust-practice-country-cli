@@ -8,13 +8,13 @@ pub struct Args {
     pub region: Option<String>,
 
     #[arg(long, default_value = "population")]
-    pub sort_by: SortBy,
+    pub sort: SortBy,
 
     #[arg(long, default_value_t = 10)]
     pub top: usize,
 }
 
-#[derive(ValueEnum, Clone)]
+#[derive(ValueEnum, Clone, PartialEq)]
 pub enum SortBy {
     Population,
     Area,
