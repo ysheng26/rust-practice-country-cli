@@ -1,18 +1,20 @@
 use clap::Parser;
+use clap::ValueEnum;
 
+// question: seems like there are too many "pub" here
 #[derive(Parser)]
 pub struct Args {
     #[arg(long)]
-    region: Option<String>,
+    pub region: Option<String>,
 
     #[arg(long, default_value = "population")]
-    sort: String,
+    pub sort_by: SortBy,
 
     #[arg(long, default_value_t = 10)]
-    top: usize,
+    pub top: usize,
 }
 
-// #[derive(ValueEnum)]
+#[derive(ValueEnum, Clone)]
 pub enum SortBy {
     Population,
     Area,
