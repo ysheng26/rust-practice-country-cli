@@ -2,6 +2,7 @@
 // make requests
 
 use std::cmp::Reverse;
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
@@ -34,14 +35,29 @@ pub struct Item {
     region: String,
     area: f32,
     population: u32,
+    languages: Option<HashMap<String, String>>,
 }
 
 impl Display for Item {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        // as_ref converts Option<HashMap> to Option<&HashMap>
+        // first map changes content in Option
+        // second map goes over hashmap and converts to one string
+        let languages = self
+            .languages
+            .as_ref()
+            .map(|hashmap| {
+                hashmap
+                    .iter()
+                    .map(|(k, v)| format!("{}:{}", k, v))
+                    .collect::<Vec<_>>()
+                    .join(",")
+            })
+            .unwrap_or("none".to_string());
         write!(
             f,
-            "[ name={} | region=\"{}\" | area={} | population={} ]",
-            self.name, self.region, self.area, self.population
+            "[ name={} | region=\"{}\" | area={} | population={} | languages=\"{}\" ]",
+            self.name, self.region, self.area, self.population, languages,
         )
     }
 }
@@ -72,7 +88,7 @@ impl Display for Name {
 // question: is my return type OK?
 pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
     let body = reqwest::blocking::get(
-        "https://restcountries.com/v3.1/all?fields=name,region,population,area",
+        "https://restcountries.com/v3.1/all?fields=name,region,population,area,languages",
     )?;
 
     let xs = body.json::<Vec<Item>>()?;

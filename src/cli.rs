@@ -14,6 +14,9 @@ pub struct Args {
 
     #[arg(long, default_value_t = 10)]
     pub top: usize,
+
+    #[arg(long)]
+    pub language: Option<String>,
 }
 
 #[derive(ValueEnum, Clone, PartialEq)]
