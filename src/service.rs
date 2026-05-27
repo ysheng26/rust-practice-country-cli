@@ -2,8 +2,10 @@
 // make requests
 
 use std::cmp::Reverse;
+use std::fmt::Display;
+use std::fmt::Error;
+use std::fmt::Formatter;
 
-use anyhow;
 use serde::{Deserialize, Serialize};
 
 use crate::cli;
@@ -34,12 +36,37 @@ pub struct Item {
     population: u32,
 }
 
+impl Display for Item {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(
+            f,
+            "[ name={} | region=\"{}\" | area={} | population={} ]",
+            self.name, self.region, self.area, self.population
+        )
+    }
+}
+
+// impl Display for Vec<Item> {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+//         write!(f, "[{}]", self.item)
+//     }
+// }
+
 // question: why do I need Eq, Ord, PartialEq and PartialOrd
 #[derive(Serialize, Deserialize, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Name {
     common: String,
     official: String,
     // nativeName
+}
+impl Display for Name {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(
+            f,
+            "[ common=\"{}\" | official=\"{}\" ]",
+            self.common, self.official
+        )
+    }
 }
 
 // question: is my return type OK?
@@ -55,12 +82,17 @@ pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
     let mut xs: Vec<_> = xs
         .into_iter()
         .filter(|x| {
-            if let Some(ref region) = args.region {
-                x.region == *region
-            } else {
-                true
-            }
+            args.region
+                .as_deref()
+                .map_or(true, |region| region == x.region)
         })
+        // .filter(|x| {
+        //     if let Some(ref region) = args.region {
+        //         x.region == *region
+        //     } else {
+        //         true
+        //     }
+        // })
         .collect();
 
     match args.sort {

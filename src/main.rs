@@ -1,5 +1,4 @@
 use clap::Parser;
-use serde_json::json;
 
 mod cli;
 mod service;
@@ -19,5 +18,13 @@ fn main() {
 
     // question: should I unwrap here?
     let xs = service::get_results(args).expect("failed to get results");
-    println!("{}", serde_json::to_string_pretty(&xs).unwrap());
+    // println!("{}", serde_json::to_string_pretty(&xs).unwrap());
+
+    for (i, item) in xs.iter().enumerate() {
+        println!("{} - {}", i, item);
+    }
+
+    // for item in xs.iter() {
+    //     println!("{}", item);
+    // }
 }
