@@ -63,3 +63,23 @@ Stretch Goals (if you finish fast)
 	•	Sort ascending/descending with --asc flag
 
 Come back when you’re stuck or done — either is a good reason to talk.
+
+
+
+From the original requirements:
+
+1. `--language <lang>` filter — e.g. all countries that speak Spanish. The languages field in the API is a nested map, so this is a good `filter_map` / `flat_map` exercise
+2. `--min-population <n>` flag
+3. Sort ascending/descending with `--asc` flag
+
+The language one is the most interesting for your goals — the API returns languages as a nested map like:
+
+```json
+"languages": {
+    "spa": "Spanish",
+    "eng": "English"
+}
+```
+
+So you'll need to deserialize that, then filter countries where any value in the map matches the language argument. That's where `filter_map` or `flat_map` becomes the natural solution and is worth doing before the other two.
+
