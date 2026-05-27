@@ -1,3 +1,5 @@
+> https://restcountries.com/v3.1/all?fields=name,region,population,area
+
 > https://restcountries.com/v3.1/all?fields=name,region,capital,currencies,population,languages,area
 
 

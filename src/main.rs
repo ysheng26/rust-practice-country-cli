@@ -7,12 +7,16 @@ mod service;
 // I can just use Args and pass to reqwest
 
 fn main() {
-    let cli = cli::Args::parse();
+    let args = cli::Args::parse();
 
     // question: Some(ref region) or cli.region.as_deref()
-    if let Some(ref region) = cli.region {
-        println!("region = {}", region);
-    }
+    // if let Some(ref region) = args.region {
+    //     println!("region = {}", region);
+    // }
 
     // sort by population, area or name
+
+    // question: should I unwrap here?
+    let xs = service::get_results(args).expect("failed to get results");
+    println!("{:?}", xs);
 }
