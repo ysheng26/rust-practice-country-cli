@@ -102,15 +102,16 @@ pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
                 .as_deref()
                 .map_or(true, |region| region == x.region)
         })
-        // .filter(|x| {
-        //     if let Some(ref region) = args.region {
-        //         x.region == *region
-        //     } else {
-        //         true
-        //     }
-        // })
+        .filter(|x| {
+            args.language.as_deref().map_or(true, |lang_arg| {
+                x.languages.as_ref().map_or(false, |hashmap| {
+                    hashmap.values().any(|lang| lang == lang_arg)
+                })
+            })
+        })
         .collect();
 
+    // sort order desc by default (except names)
     match args.sort {
         cli::SortBy::Population => xs.sort_by_key(|x| Reverse(x.population)),
         cli::SortBy::Area => xs.sort_by(|a, b| b.area.total_cmp(&a.area)),
