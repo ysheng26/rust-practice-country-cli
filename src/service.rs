@@ -98,6 +98,7 @@ pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
                 })
             })
         })
+        .filter(|x| x.population >= args.min_population)
         .collect();
 
     xs.sort_by(|a, b| {
