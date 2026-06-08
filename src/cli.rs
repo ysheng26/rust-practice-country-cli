@@ -17,6 +17,9 @@ pub struct Args {
 
     #[arg(long)]
     pub language: Option<String>,
+
+    #[arg(long)]
+    pub asc: bool,
 }
 
 #[derive(ValueEnum, Clone, PartialEq)]

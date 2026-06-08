@@ -1,7 +1,6 @@
 // define types to serde
 // make requests
 
-use std::cmp::Reverse;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::fmt::Error;
@@ -53,7 +52,7 @@ impl Display for Item {
                     .collect::<Vec<_>>()
                     .join(",")
             })
-            .unwrap_or("none".to_string());
+            .unwrap_or_else(|| "none".to_string());
         write!(
             f,
             "[ name={} | region=\"{}\" | area={} | population={} | languages=\"{}\" ]",
@@ -62,13 +61,6 @@ impl Display for Item {
     }
 }
 
-// impl Display for Vec<Item> {
-//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-//         write!(f, "[{}]", self.item)
-//     }
-// }
-
-// question: why do I need Eq, Ord, PartialEq and PartialOrd
 #[derive(Serialize, Deserialize, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Name {
     common: String,
@@ -85,7 +77,6 @@ impl Display for Name {
     }
 }
 
-// question: is my return type OK?
 pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
     let body = reqwest::blocking::get(
         "https://restcountries.com/v3.1/all?fields=name,region,population,area,languages",
@@ -93,8 +84,6 @@ pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
 
     let xs = body.json::<Vec<Item>>()?;
 
-    // question: difference between iter() and into_iter()
-    // question: is this really more readable
     let mut xs: Vec<_> = xs
         .into_iter()
         .filter(|x| {
@@ -111,12 +100,14 @@ pub fn get_results(args: cli::Args) -> anyhow::Result<Vec<Item>> {
         })
         .collect();
 
-    // sort order desc by default (except names)
-    match args.sort {
-        cli::SortBy::Population => xs.sort_by_key(|x| Reverse(x.population)),
-        cli::SortBy::Area => xs.sort_by(|a, b| b.area.total_cmp(&a.area)),
-        cli::SortBy::Name => xs.sort_by(|a, b| a.name.cmp(&b.name)),
-    }
+    xs.sort_by(|a, b| {
+        let ord = match args.sort {
+            cli::SortBy::Population => a.population.cmp(&b.population),
+            cli::SortBy::Area => a.area.total_cmp(&b.area),
+            cli::SortBy::Name => a.name.cmp(&b.name),
+        };
+        if args.asc { ord } else { ord.reverse() }
+    });
 
     let xs = xs.into_iter().take(args.top).collect();
 
